@@ -1,0 +1,10 @@
+package View.enums.Messages;
+
+public enum RegisterMenuMessages {
+    INCORRECT_USERNAME_FORMAT,
+    INCORRECT_PASSWORD_FORMAT,
+    USERNAME_EXISTS,
+    USERNAME_NOT_EXISTS,
+    INCORRECT_PASSWORD,
+    SUCCESS
+}

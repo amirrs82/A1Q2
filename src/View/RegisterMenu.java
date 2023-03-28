@@ -1,0 +1,68 @@
+package View;
+
+import Controller.RegisterMenuController;
+import View.enums.Commands.RegisterMenuCommands;
+import View.enums.Messages.RegisterMenuMessages;
+
+import java.util.Scanner;
+import java.util.regex.Matcher;
+
+public class RegisterMenu {
+    public void run(Scanner scanner) {
+        while (true) {
+            String command = scanner.nextLine().trim();
+            Matcher matcher;
+            if (command.equals("exit")) break;
+            else if ((matcher = RegisterMenuCommands.getMatcher(command, RegisterMenuCommands.REGISTER)) != null)
+                checkRegister(matcher);
+            else if ((matcher = RegisterMenuCommands.getMatcher(command, RegisterMenuCommands.LOGIN)) != null)
+                checkRegister(matcher);
+
+
+        }
+    }
+
+    public void checkRegister(Matcher matcher) {
+        String username = matcher.group("username");
+        String password = matcher.group("password");
+        RegisterMenuMessages message = RegisterMenuController.checkRegister(username, password);
+        switch (message) {
+            case INCORRECT_USERNAME_FORMAT:
+                System.out.println("Incorrect format for username!");
+                break;
+            case INCORRECT_PASSWORD_FORMAT:
+                System.out.println("Incorrect format for password!");
+                break;
+            case USERNAME_EXISTS:
+                System.out.println("Username already exists!");
+                break;
+            case SUCCESS:
+                System.out.println("User " + username + " created successfully!");
+        }
+    }
+
+    public void checkLogin(Matcher matcher) {
+        String username = matcher.group("username");
+        String password = matcher.group("password");
+        RegisterMenuMessages message = RegisterMenuController.checkRegister(username, password);
+        switch (message) {
+            case INCORRECT_USERNAME_FORMAT:
+                System.out.println("Incorrect format for username!");
+                break;
+            case INCORRECT_PASSWORD_FORMAT:
+                System.out.println("Incorrect format for password!");
+                break;
+            case USERNAME_NOT_EXISTS:
+                System.out.println("Username doesn't exist!");
+                break;
+            case INCORRECT_PASSWORD:
+                System.out.println("Password is incorrect!");
+                break;
+            case SUCCESS:
+                System.out.println("User " + username + " logged in!");
+                new MainMenu().run();
+                break;
+        }
+    }
+
+}
