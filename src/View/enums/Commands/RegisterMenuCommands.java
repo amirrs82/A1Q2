@@ -10,7 +10,7 @@ public enum RegisterMenuCommands {
     ;
 
 
-    private String regex;
+    private final String regex;
 
     RegisterMenuCommands(String regex) {
         this.regex = regex;

@@ -1,6 +1,8 @@
 package View;
 
 import Controller.RegisterMenuController;
+import Model.ClashRoyale;
+import Model.User;
 import View.enums.Commands.RegisterMenuCommands;
 import View.enums.Messages.RegisterMenuMessages;
 
@@ -8,17 +10,18 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 
 public class RegisterMenu {
-    public void run(Scanner scanner) {
+
+    public void run() {
+        Scanner scanner = new Scanner(System.in);
         while (true) {
             String command = scanner.nextLine().trim();
             Matcher matcher;
             if (command.equals("exit")) break;
+            else if (command.equals("show current menu")) System.out.println("Register/Login Menu");
             else if ((matcher = RegisterMenuCommands.getMatcher(command, RegisterMenuCommands.REGISTER)) != null)
                 checkRegister(matcher);
             else if ((matcher = RegisterMenuCommands.getMatcher(command, RegisterMenuCommands.LOGIN)) != null)
-                checkRegister(matcher);
-
-
+                checkLogin(matcher, scanner);
         }
     }
 
@@ -38,13 +41,14 @@ public class RegisterMenu {
                 break;
             case SUCCESS:
                 System.out.println("User " + username + " created successfully!");
+                break;
         }
     }
 
-    public void checkLogin(Matcher matcher) {
+    public void checkLogin(Matcher matcher, Scanner scanner) {
         String username = matcher.group("username");
         String password = matcher.group("password");
-        RegisterMenuMessages message = RegisterMenuController.checkRegister(username, password);
+        RegisterMenuMessages message = RegisterMenuController.checkLogin(username, password);
         switch (message) {
             case INCORRECT_USERNAME_FORMAT:
                 System.out.println("Incorrect format for username!");
@@ -60,7 +64,9 @@ public class RegisterMenu {
                 break;
             case SUCCESS:
                 System.out.println("User " + username + " logged in!");
-                new MainMenu().run();
+                User loggedInUser = ClashRoyale.getUserByUsername(username);
+                ClashRoyale.setCurrentUser(loggedInUser);
+                new MainMenu().run(scanner);
                 break;
         }
     }
