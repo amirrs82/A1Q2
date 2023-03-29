@@ -1,4 +1,4 @@
-import View.RegisterMenu;
+import View.Menus.RegisterMenu;
 
 public class Main {
     public static void main(String[] args) {

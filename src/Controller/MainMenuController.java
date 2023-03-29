@@ -1,12 +1,23 @@
 package Controller;
 
+import Model.ClashRoyale;
 import Model.User;
+import View.enums.Messages.MainMenuMessages;
 
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.ArrayList;
+import java.util.Comparator;
 
 public class MainMenuController {
+    public static MainMenuMessages checkStartGame(String turnsCount, String username) {
+        if (checkTurnsCount(turnsCount))
+            if (RegisterMenuController.checkUsernameFormat(username))
+                if (ClashRoyale.usernameExist(username))
+                    return MainMenuMessages.SUCCESS;
+                else return MainMenuMessages.USERNAME_NOT_EXISTS;
+            else return MainMenuMessages.INCORRECT_USERNAME_FORMAT;
+        else return MainMenuMessages.INVALID_TURNS_COUNT;
+    }
+
     public static ArrayList<User> sortUsers(ArrayList<User> users) {
         ArrayList<User> sortedUsers = new ArrayList<>(users);
         Comparator<User> comparator;
@@ -18,5 +29,10 @@ public class MainMenuController {
         comparator = comparator.thenComparing(User::getUsername);
         sortedUsers.sort(comparator);
         return sortedUsers;
+    }
+
+    public static boolean checkTurnsCount(String turnsCount) {
+        //matches all numbers from 5 to 30
+        return turnsCount.matches("[5-9]|[1-2]\\d|30");
     }
 }

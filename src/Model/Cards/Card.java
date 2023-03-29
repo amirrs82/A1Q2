@@ -1,10 +1,22 @@
 package Model.Cards;
 
 public class Card {
-    private static int damage;
-    private static int hitPoint;
+    private int damage;
     private int currentRow;
     private int currentColumn;
+    private final int price;
+
+    private String cardName;
+
+    public Card(int damage, int price, String cardName) {
+        this.damage = damage;
+        this.price = price;
+        this.cardName = cardName;
+    }
+
+    public int getPrice() {
+        return price;
+    }
 
     public int getCurrentRow() {
         return currentRow;
@@ -22,20 +34,20 @@ public class Card {
         this.currentColumn = currentColumn;
     }
 
-
-    public static void setDamage(int damage) {
-        Card.damage = damage;
-    }
-
-    public static void setHitPoint(int hitPoint) {
-        Card.hitPoint = hitPoint;
-    }
-
-    public static int getHitPoint() {
-        return hitPoint;
-    }
-
-    public static int getDamage() {
+    public int getDamage() {
         return damage;
+    }
+
+    public void setDamage(int damage) {
+        this.damage = damage;
+    }
+
+
+    public String getCardName() {
+        return cardName;
+    }
+
+    public void setCardName(String cardName) {
+        this.cardName = cardName;
     }
 }

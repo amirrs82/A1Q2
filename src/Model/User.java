@@ -1,29 +1,34 @@
 package Model;
 
 
-import Model.Cards.Barbarian;
+import Controller.MainMenuController;
 import Model.Cards.Card;
-import Model.Cards.Fireball;
 
 import java.util.ArrayList;
 
 public class User {
 
-    private ArrayList<Card> battleDeck = new ArrayList<>();
-    private String username;
-    private String password;
+    private final ArrayList<Card> battleDeck = new ArrayList<>();
 
+    private final ArrayList<Card> boughtCards;
+
+    private final String username;
+    private String password;
     private int gold;
     private int level;
     private int experience;
-
 
     {
         gold = 100;
         level = 1;
         experience = 0;
-        battleDeck.add(new Barbarian());
-        battleDeck.add(new Fireball());
+        battleDeck.add(ClashRoyale.getCardByName("Barbarian"));
+        battleDeck.add(ClashRoyale.getCardByName("Fireball"));
+        boughtCards = new ArrayList<>(battleDeck);
+    }
+
+    public ArrayList<Card> getBoughtCards() {
+        return boughtCards;
     }
 
     public int getGold() {
@@ -55,17 +60,35 @@ public class User {
         return username;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public int getRanking() {
+        User currentUser = ClashRoyale.getCurrentUser();
+        ArrayList<User> sortedUsers = MainMenuController.sortUsers(ClashRoyale.getUsers());
+        int i = 0;
+        for (User sortedUser : sortedUsers) {
+            if (sortedUser == currentUser)
+                return i + 1;
+            i++;
+        }
+        return 0;
     }
 
     public String getPassword() {
         return password;
     }
 
+    public ArrayList<Card> getBattleDeck() {
+        return battleDeck;
+    }
+
     public void setPassword(String password) {
         this.password = password;
     }
+
+    public static boolean isPasswordCorrect(String username, String password) {
+        User user = ClashRoyale.getUserByUsername(username);
+        return user.getPassword().equals(password);
+    }
+
 
     public User(String username, String password) {
         this.username = username;

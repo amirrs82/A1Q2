@@ -1,9 +1,23 @@
 package Model;
 
+import Model.Cards.Card;
+import Model.Cards.Spell;
+import Model.Cards.Troop;
+
 import java.util.ArrayList;
 
 public class ClashRoyale {
     private static final ArrayList<User> users = new ArrayList<>();
+    private static final ArrayList<Card> cards = new ArrayList<>();
+
+    static {
+        cards.add(new Troop(900, 2000, 100, "Barbarian"));
+        cards.add(new Troop(1500, 3500, 180, "Ice Wizard"));
+        cards.add(new Troop(1200, 3300, 200, "Baby Dragon"));
+        cards.add(new Spell(1600, 100, "Fireball"));
+        cards.add(new Spell(2000, 150, "Heal"));//2000 or 1000?
+    }
+
     private static User currentUser;
 
     public static void addUser(User user) {
@@ -24,8 +38,18 @@ public class ClashRoyale {
 
     public static User getUserByUsername(String username) {
         for (User user : users)
-            if (user.getUsername().equals(username))
-                return user;
+            if (user.getUsername().equals(username)) return user;
         return null;
     }
+
+    public static boolean usernameExist(String username) {
+        return getUserByUsername(username) != null;
+    }
+
+    public static Card getCardByName(String name) {
+        for (Card card : cards)
+            if (card.getCardName().equals(name)) return card;
+        return null;
+    }
+
 }

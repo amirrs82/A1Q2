@@ -1,4 +1,4 @@
-package View;
+package View.Menus;
 
 import Controller.RegisterMenuController;
 import Model.ClashRoyale;
@@ -13,15 +13,17 @@ public class RegisterMenu {
 
     public void run() {
         Scanner scanner = new Scanner(System.in);
+        String command;
+        Matcher matcher;
         while (true) {
-            String command = scanner.nextLine().trim();
-            Matcher matcher;
-            if (command.equals("exit")) break;
+            command = scanner.nextLine();
+            if (command.equals("Exit")) break;
             else if (command.equals("show current menu")) System.out.println("Register/Login Menu");
             else if ((matcher = RegisterMenuCommands.getMatcher(command, RegisterMenuCommands.REGISTER)) != null)
                 checkRegister(matcher);
             else if ((matcher = RegisterMenuCommands.getMatcher(command, RegisterMenuCommands.LOGIN)) != null)
                 checkLogin(matcher, scanner);
+            else System.out.println("Invalid command!");
         }
     }
 
