@@ -17,7 +17,8 @@ public class ShopMenu {
             if (command.equals("back")) {
                 System.out.println("Entered main menu!");
                 break;
-            } else if ((matcher = ShopMenuCommands.getMatcher(command, ShopMenuCommands.BUY_CARD)) != null)
+            } else if (command.equals("show current menu")) System.out.println("Profile Menu");
+            else if ((matcher = ShopMenuCommands.getMatcher(command, ShopMenuCommands.BUY_CARD)) != null)
                 checkBuyCard(matcher);
             else if ((matcher = ShopMenuCommands.getMatcher(command, ShopMenuCommands.SELL_CARD)) != null)
                 checkSellCard(matcher);
@@ -46,7 +47,7 @@ public class ShopMenu {
 
     private void checkSellCard(Matcher matcher) {
         String name = matcher.group("name");
-        ShopMenuMessages message = ShopMenuController.checkBuyCard(name);
+        ShopMenuMessages message = ShopMenuController.checkSellCard(name);
         switch (message) {
             case INVALID_CARD_NAME:
                 System.out.println("Invalid card name!");

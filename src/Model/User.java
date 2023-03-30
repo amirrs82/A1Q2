@@ -12,6 +12,8 @@ public class User {
 
     private final ArrayList<Card> boughtCards;
 
+    private ArrayList<Castle> castles = new ArrayList<>();
+
     private final String username;
     private String password;
     private int gold;
@@ -29,6 +31,18 @@ public class User {
 
     public ArrayList<Card> getBoughtCards() {
         return boughtCards;
+    }
+
+    public ArrayList<Castle> getCastles() {
+        return castles;
+    }
+
+    public static void setCastles(User user) {
+        int level = user.getLevel();
+        user.getCastles().clear();
+        user.getCastles().add(new Castle(level * 3600, level * 600, "middle castle"));
+        user.getCastles().add(new Castle(level * 2500, level * 600, "right castle"));
+        user.getCastles().add(new Castle(level * 2500, level * 600, "left castle"));
     }
 
     public int getGold() {
@@ -65,8 +79,7 @@ public class User {
         ArrayList<User> sortedUsers = MainMenuController.sortUsers(ClashRoyale.getUsers());
         int i = 0;
         for (User sortedUser : sortedUsers) {
-            if (sortedUser == currentUser)
-                return i + 1;
+            if (sortedUser == currentUser) return i + 1;
             i++;
         }
         return 0;
@@ -88,7 +101,6 @@ public class User {
         User user = ClashRoyale.getUserByUsername(username);
         return user.getPassword().equals(password);
     }
-
 
     public User(String username, String password) {
         this.username = username;

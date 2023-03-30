@@ -64,7 +64,7 @@ public class MainMenu {
                 break;
             case SUCCESS:
                 System.out.println("Battle started with user " + username);
-                new GameMenu().run(scanner, matcher);
+                new GameMenu().run(scanner, username, Integer.parseInt(turnsCount));
                 break;
         }
     }

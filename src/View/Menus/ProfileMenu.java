@@ -26,6 +26,7 @@ public class ProfileMenu {
                 break;
             } else if ((matcher = ProfileMenuCommands.getMatcher(command, ProfileMenuCommands.CHANGE_PASSWORD)) != null)
                 changePassword(matcher);
+            else if (command.equals("show current menu")) System.out.println("Profile Menu");
             else if (command.equals("Info")) showInfo();
             else if ((matcher = ProfileMenuCommands.getMatcher(command, ProfileMenuCommands.REMOVE_FROM_BATTLE_DECK)) != null)
                 checkRemoveFromDeck(matcher);
@@ -64,7 +65,7 @@ public class ProfileMenu {
 
     private void checkRemoveFromDeck(Matcher matcher) {
         String name = matcher.group("name");
-        ProfileMenuMessages message = ProfileMenuController.checkRemoveFromDeck(name);
+        ProfileMenuMessages message = ProfileMenuController.checkRemoveFromDeck(name, currentUser);
         switch (message) {
             case INVALID_CARD_NAME:
                 System.out.println("Invalid card name!");
@@ -83,7 +84,7 @@ public class ProfileMenu {
 
     private void checkAddToDeck(Matcher matcher) {
         String name = matcher.group("name");
-        ProfileMenuMessages message = ProfileMenuController.checkAddToDeck(name);
+        ProfileMenuMessages message = ProfileMenuController.checkAddToDeck(name, currentUser);
         switch (message) {
             case INVALID_CARD_NAME:
                 System.out.println("Invalid card name!");

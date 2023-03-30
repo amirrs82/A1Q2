@@ -1,10 +1,14 @@
 package Model.Cards;
 
+import Model.User;
+
 public class Card {
     private int damage;
     private int currentRow;
     private int currentColumn;
     private final int price;
+
+    private User owner;
 
     private String cardName;
 
@@ -24,6 +28,14 @@ public class Card {
 
     public void setCurrentRow(int currentRow) {
         this.currentRow = currentRow;
+    }
+
+    public User getOwner() {
+        return owner;
+    }
+
+    public void setOwner(User owner) {
+        this.owner = owner;
     }
 
     public int getCurrentColumn() {

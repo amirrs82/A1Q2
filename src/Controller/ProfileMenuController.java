@@ -8,7 +8,6 @@ import View.enums.Messages.ProfileMenuMessages;
 import java.util.ArrayList;
 
 public class ProfileMenuController {
-    private static final User currentUser = ClashRoyale.getCurrentUser();
 
     public static ProfileMenuMessages changePassword(String oldPassword, String newPassword, User currentUser) {
         if (User.isPasswordCorrect(currentUser.getUsername(), oldPassword))
@@ -19,7 +18,7 @@ public class ProfileMenuController {
         else return ProfileMenuMessages.INCORRECT_PASSWORD;
     }
 
-    public static ProfileMenuMessages checkRemoveFromDeck(String name) {
+    public static ProfileMenuMessages checkRemoveFromDeck(String name, User currentUser) {
         Card card = ClashRoyale.getCardByName(name);
         ArrayList<Card> battleDeck = currentUser.getBattleDeck();
         if (card != null)
@@ -32,7 +31,7 @@ public class ProfileMenuController {
         else return ProfileMenuMessages.INVALID_CARD_NAME;
     }
 
-    public static ProfileMenuMessages checkAddToDeck(String name) {
+    public static ProfileMenuMessages checkAddToDeck(String name, User currentUser) {
         Card card = ClashRoyale.getCardByName(name);
         ArrayList<Card> battleDeck = currentUser.getBattleDeck();
         ArrayList<Card> boughtCards = currentUser.getBoughtCards();
