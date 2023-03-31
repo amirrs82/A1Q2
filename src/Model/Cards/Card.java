@@ -3,14 +3,11 @@ package Model.Cards;
 import Model.User;
 
 public class Card {
-    private int damage;
-    private int currentRow;
-    private int currentColumn;
+    private final int damage;
     private final int price;
-
+    private int currentRow;
     private User owner;
-
-    private String cardName;
+    private final String cardName;
 
     public Card(int damage, int price, String cardName) {
         this.damage = damage;
@@ -38,28 +35,11 @@ public class Card {
         this.owner = owner;
     }
 
-    public int getCurrentColumn() {
-        return currentColumn;
-    }
-
-    public void setCurrentColumn(int currentColumn) {
-        this.currentColumn = currentColumn;
-    }
-
     public int getDamage() {
         return damage;
     }
 
-    public void setDamage(int damage) {
-        this.damage = damage;
-    }
-
-
     public String getCardName() {
         return cardName;
-    }
-
-    public void setCardName(String cardName) {
-        this.cardName = cardName;
     }
 }

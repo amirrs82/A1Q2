@@ -6,31 +6,12 @@ import Model.Cards.Troop;
 
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class ClashRoyale {
-    static class Map {
-        private ArrayList<Integer> rows;
-        private ArrayList<String> columns;
-
-    }
 
     private static final ArrayList<User> users = new ArrayList<>();
     private static final ArrayList<Card> cards = new ArrayList<>();
-    private static final HashMap<String, HashMap<Integer, ArrayList<Card>>> map = new HashMap<>() {{
-        put("left", new HashMap<>());
-        put("right", new HashMap<>());
-        put("middle", new HashMap<>());
-    }};
-    private static final HashMap<String, HashMap<Card, User>> myMap = new HashMap<>();
-
-    public static void setMyMap() {
-        for (int i = 0; i < 15; i++) {
-            myMap.put("left", new HashMap<>());
-            myMap.put("right", new HashMap<>());
-            myMap.put("middle", new HashMap<>());
-        }
-    }
+    private static final ArrayList<Place> map = new ArrayList<>();
 
     static {
         cards.add(new Troop(900, 2000, 100, "Barbarian"));
@@ -40,16 +21,19 @@ public class ClashRoyale {
         cards.add(new Spell(1000, 150, "Heal"));//TODO:2000 or 1000?
     }
 
-    public static HashMap<String, HashMap<Integer, ArrayList<Card>>> getMap() {
-        return map;
-    }
-
     public static void setMap() {
         for (int i = 0; i < 15; i++) {
-            map.get("left").put(i + 1, new ArrayList<>());
-            map.get("right").put(i + 1, new ArrayList<>());
-            map.get("middle").put(i + 1, new ArrayList<>());
+            map.add(new Place("left", i + 1));
+            map.add(new Place("middle", i + 1));
+            map.add(new Place("right", i + 1));
         }
+//        for (int i = 0; i < 15; i++) map.add(new Place("left", i + 1));
+//        for (int i = 0; i < 15; i++) map.add(new Place("middle", i + 1));
+//        for (int i = 0; i < 15; i++) map.add(new Place("right", i + 1));
+    }
+
+    public static ArrayList<Place> getMap() {
+        return map;
     }
 
     private static User currentUser;
@@ -86,4 +70,9 @@ public class ClashRoyale {
         return null;
     }
 
+    public static Place getPlace(String lineDirection, int rowNumber) {
+        for (Place place : map)
+            if (place.getLineDirection().equals(lineDirection) && place.getRowNumber() == rowNumber) return place;
+        return null;
+    }
 }

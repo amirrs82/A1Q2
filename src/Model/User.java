@@ -45,8 +45,8 @@ public class User {
         int level = getLevel();
         getCastles().clear();
         getCastles().add(new Castle(level * 3600, level * 600, "middle castle"));
-        getCastles().add(new Castle(level * 2500, level * 600, "right castle"));
         getCastles().add(new Castle(level * 2500, level * 600, "left castle"));
+        getCastles().add(new Castle(level * 2500, level * 600, "right castle"));
     }
 
     public ArrayList<Castle> getCastles() {
