@@ -19,6 +19,8 @@ public class User {
     private int gold;
     private int level;
     private int experience;
+    private int cardsToPlay = 1;
+    private int movesLeft = 3;
 
     {
         gold = 100;
@@ -33,16 +35,38 @@ public class User {
         return boughtCards;
     }
 
+    public Castle getCastleBySide(String side) {
+        for (Castle castle : castles)
+            if (castle.getSide().equals(side + " castle")) return castle;
+        return null;
+    }
+
+    public  void setCastles() {
+        int level = getLevel();
+        getCastles().clear();
+        getCastles().add(new Castle(level * 3600, level * 600, "middle castle"));
+        getCastles().add(new Castle(level * 2500, level * 600, "right castle"));
+        getCastles().add(new Castle(level * 2500, level * 600, "left castle"));
+    }
+
     public ArrayList<Castle> getCastles() {
         return castles;
     }
 
-    public static void setCastles(User user) {
-        int level = user.getLevel();
-        user.getCastles().clear();
-        user.getCastles().add(new Castle(level * 3600, level * 600, "middle castle"));
-        user.getCastles().add(new Castle(level * 2500, level * 600, "right castle"));
-        user.getCastles().add(new Castle(level * 2500, level * 600, "left castle"));
+    public int getCardsToPlay() {
+        return cardsToPlay;
+    }
+
+    public void setCardsToPlay(int cardsToPlay) {
+        this.cardsToPlay = cardsToPlay;
+    }
+
+    public int getMovesLeft() {
+        return movesLeft;
+    }
+
+    public void setMovesLeft(int movesLeft) {
+        this.movesLeft = movesLeft;
     }
 
     public int getGold() {

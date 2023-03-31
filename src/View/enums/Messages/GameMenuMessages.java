@@ -1,7 +1,19 @@
 package View.enums.Messages;
 
 public enum GameMenuMessages {
-    INVALID_LINE,
+    INVALID_DIRECTION,
+    INVALID_MOVE,
+    NO_TROOPS_IN_PLACE,
+    NO_MOVES_LEFT,
+    INVALID_LINE_DIRECTION,
+    INVALID_ROW,
+    NO_CARDS_TO_PLAY_LEFT,
+    NOT_NEAR_CASTLE,
+    NOT_IN_BATTLE_DECK,
+    INVALID_CARD_NAME,
+    DESTROYED_CASTLE,
+    NEXT_TURN,
+    END_GAME,
     SUCCESS,
 
 }

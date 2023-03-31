@@ -28,7 +28,6 @@ public class RegisterMenuController {
         else return RegisterMenuMessages.INCORRECT_USERNAME_FORMAT;
     }
 
-
     public static boolean checkUsernameFormat(String username) {
         return username.matches("[a-zA-Z]+");
     }
@@ -38,5 +37,4 @@ public class RegisterMenuController {
             return !password.contains(" ");
         return false;
     }
-
 }
