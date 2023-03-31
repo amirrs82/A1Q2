@@ -72,7 +72,8 @@ public class ClashRoyale {
 
     public static Place getPlace(String lineDirection, int rowNumber) {
         for (Place place : map)
-            if (place.getLineDirection().equals(lineDirection) && place.getRowNumber() == rowNumber) return place;
+            if (place.getLineDirection().equals(lineDirection) && place.getRowNumber() == rowNumber)
+                return place;
         return null;
     }
 }

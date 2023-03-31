@@ -56,7 +56,7 @@ public class GameMenu {
             if (castle.getHitPoint() > 0)
                 System.out.println(castle.getSide() + ": " + castle.getHitPoint());
             else System.out.println(castle.getSide() + ": " + -1);
-        ;
+
     }
 
     private void showLineInfo(Matcher matcher) {
@@ -111,9 +111,9 @@ public class GameMenu {
                 System.out.println("Invalid move!");
                 break;
             case SUCCESS:
-                Card userCardInPlace = GameMenuController.getCardInPlace(ClashRoyale.getPlace(lineDirection, rowNumber + 1), currentPlayer);
-                String cardName = userCardInPlace.getCardName();
-                int currentRow = userCardInPlace.getCurrentRow();
+                Troop troop = (Troop) GameMenuController.getMovedCard();
+                String cardName = troop.getCardName();
+                int currentRow = troop.getCurrentRow();
                 System.out.println(cardName + " moved successfully to row " + currentRow + " in line " + lineDirection);
                 break;
         }

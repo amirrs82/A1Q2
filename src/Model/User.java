@@ -12,7 +12,7 @@ public class User {
 
     private final ArrayList<Card> boughtCards;
 
-    private ArrayList<Castle> castles = new ArrayList<>();
+    private final ArrayList<Castle> castles = new ArrayList<>();
 
     private final String username;
     private String password;
@@ -21,6 +21,7 @@ public class User {
     private int experience;
     private int cardsToPlay = 1;
     private int movesLeft = 3;
+    private int castlesDestroyed = 0;
 
     {
         gold = 100;
@@ -51,6 +52,14 @@ public class User {
 
     public ArrayList<Castle> getCastles() {
         return castles;
+    }
+
+    public int getCastlesDestroyed() {
+        return castlesDestroyed;
+    }
+
+    public void setCastlesDestroyed(int castlesDestroyed) {
+        this.castlesDestroyed = castlesDestroyed;
     }
 
     public int getCardsToPlay() {
