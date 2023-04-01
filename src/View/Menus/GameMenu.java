@@ -18,13 +18,14 @@ public class GameMenu {
     private User currentPlayer;
 
     private User otherPlayer;
+    private boolean end = false;
 
     public void run(Scanner scanner, String guestUsername, int turnsCount) {
         GameMenuController.startGame(guestUsername);
         String command;
         Matcher matcher;
         int currentTurn = 1;
-        while (currentTurn <= turnsCount * 2) {
+        while (!end) {
             currentPlayer = GameMenuController.getCurrentPlayer();
             otherPlayer = GameMenuController.getOtherPlayer();
             command = scanner.nextLine();
@@ -52,11 +53,20 @@ public class GameMenu {
     }
 
     private void showHitPoints() {
-        for (Castle castle : otherPlayer.getCastles())
-            if (castle.getHitPoint() > 0)
-                System.out.println(castle.getSide() + ": " + castle.getHitPoint());
-            else System.out.println(castle.getSide() + ": " + -1);
+        Castle middleCastle = otherPlayer.getCastleBySide("middle");
+        Castle leftCastle = otherPlayer.getCastleBySide("left");
+        Castle rightCastle = otherPlayer.getCastleBySide("right");
+        System.out.print("middle castle: ");
+        if (middleCastle != null && middleCastle.getHitPoint() > 0) System.out.println(middleCastle.getHitPoint());
+        else System.out.println("-1");
 
+        System.out.print("left castle: ");
+        if (leftCastle != null && leftCastle.getHitPoint() > 0) System.out.println(leftCastle.getHitPoint());
+        else System.out.println("-1");
+
+        System.out.print("right castle: ");
+        if (rightCastle != null && rightCastle.getHitPoint() > 0) System.out.println(rightCastle.getHitPoint());
+        else System.out.println("-1");
     }
 
     private void showLineInfo(Matcher matcher) {
@@ -79,8 +89,7 @@ public class GameMenu {
             if (place.getLineDirection().equals(lineDirection)) {
                 for (Card card : cardsInPlace) {
                     User owner = card.getOwner();
-                    System.out.println("row " + place.getRowNumber() + ": " + card.getCardName() + ": " +
-                            owner.getUsername());
+                    System.out.println("row " + place.getRowNumber() + ": " + card.getCardName() + ": " + owner.getUsername());
                 }
             }
         }
@@ -120,7 +129,7 @@ public class GameMenu {
     }
 
     private void checkDeployTroop(Matcher matcher) {
-        Card card = ClashRoyale.getCardByName(matcher.group("troopName"));
+        Card card = ClashRoyale.getCardTypeByName(matcher.group("troopName"));
         String lineDirection = matcher.group("lineDirection");
         int rowNumber = Integer.parseInt(matcher.group("rowNumber"));
         GameMenuMessages message = GameMenuController.checkDeployTroop(lineDirection, rowNumber, card);
@@ -202,6 +211,7 @@ public class GameMenu {
                 System.out.println("Player " + currentPlayer.getUsername() + " is now playing!");
                 break;
             case END_GAME:
+                end = true;
                 User winner = GameMenuController.getWinner();
                 if (winner == null) System.out.println("Game has ended. Result: Tie");
                 else System.out.println("Game has ended. Winner: " + winner.getUsername());

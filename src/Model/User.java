@@ -2,7 +2,9 @@ package Model;
 
 
 import Controller.MainMenuController;
+import Model.Cards.Barbarian;
 import Model.Cards.Card;
+import Model.Cards.Fireball;
 
 import java.util.ArrayList;
 
@@ -10,7 +12,7 @@ public class User {
 
     private final ArrayList<Card> battleDeck = new ArrayList<>();
 
-    private final ArrayList<Card> boughtCards;
+    private final ArrayList<Card> boughtCards = new ArrayList<>();
 
     private final ArrayList<Castle> castles = new ArrayList<>();
 
@@ -19,17 +21,20 @@ public class User {
     private int gold;
     private int level;
     private int experience;
-    private int cardsToPlay = 1;
-    private int movesLeft = 3;
-    private int castlesDestroyed = 0;
+    private int cardsToPlay;
+    private int movesLeft;
+    private int castlesDestroyed;
 
     {
         gold = 100;
         level = 1;
         experience = 0;
-        battleDeck.add(ClashRoyale.getCardByName("Barbarian"));
-        battleDeck.add(ClashRoyale.getCardByName("Fireball"));
-        boughtCards = new ArrayList<>(battleDeck);
+        Barbarian barbarian = new Barbarian(2000, 900, 100, "Barbarian");
+        Fireball fireball = new Fireball(1600, 100, "Fireball");
+        battleDeck.add(barbarian);
+        battleDeck.add(fireball);
+        boughtCards.add(barbarian);
+        boughtCards.add(fireball);
     }
 
     public ArrayList<Card> getBoughtCards() {
@@ -42,7 +47,7 @@ public class User {
         return null;
     }
 
-    public  void setCastles() {
+    public void setCastles() {
         int level = getLevel();
         getCastles().clear();
         getCastles().add(new Castle(level * 3600, level * 600, "middle castle"));

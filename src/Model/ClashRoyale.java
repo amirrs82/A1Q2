@@ -1,8 +1,6 @@
 package Model;
 
-import Model.Cards.Card;
-import Model.Cards.Spell;
-import Model.Cards.Troop;
+import Model.Cards.*;
 
 
 import java.util.ArrayList;
@@ -10,26 +8,15 @@ import java.util.ArrayList;
 public class ClashRoyale {
 
     private static final ArrayList<User> users = new ArrayList<>();
-    private static final ArrayList<Card> cards = new ArrayList<>();
     private static final ArrayList<Place> map = new ArrayList<>();
 
-    static {
-        cards.add(new Troop(900, 2000, 100, "Barbarian"));
-        cards.add(new Troop(1500, 3500, 180, "Ice Wizard"));
-        cards.add(new Troop(1200, 3300, 200, "Baby Dragon"));
-        cards.add(new Spell(1600, 100, "Fireball"));
-        cards.add(new Spell(1000, 150, "Heal"));//TODO:2000 or 1000?
-    }
-
     public static void setMap() {
+        map.clear();
         for (int i = 0; i < 15; i++) {
             map.add(new Place("left", i + 1));
             map.add(new Place("middle", i + 1));
             map.add(new Place("right", i + 1));
         }
-//        for (int i = 0; i < 15; i++) map.add(new Place("left", i + 1));
-//        for (int i = 0; i < 15; i++) map.add(new Place("middle", i + 1));
-//        for (int i = 0; i < 15; i++) map.add(new Place("right", i + 1));
     }
 
     public static ArrayList<Place> getMap() {
@@ -64,10 +51,27 @@ public class ClashRoyale {
         return getUserByUsername(username) != null;
     }
 
-    public static Card getCardByName(String name) {
+    public static boolean cardExist(ArrayList<Card> cards, String name) {
         for (Card card : cards)
-            if (card.getCardName().equals(name)) return card;
-        return null;
+            if (card.getCardName().equals(name)) return true;
+        return false;
+    }
+
+    public static Card getCardTypeByName(String name) {
+        switch (name) {
+            case "Barbarian":
+                return new Barbarian(900, 2000, 100, name);
+            case "Ice Wizard":
+                return new IceWizard(1500, 3500, 180, name);
+            case "Baby Dragon":
+                return new BabyDragon(1200, 3300, 200, name);
+            case "Fireball":
+                return new Fireball(1600, 100, name);
+            case "Heal":
+                return new Heal(1000, 150, name);
+            default:
+                return null;
+        }
     }
 
     public static Place getPlace(String lineDirection, int rowNumber) {

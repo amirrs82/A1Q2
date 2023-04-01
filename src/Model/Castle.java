@@ -5,7 +5,7 @@ public class Castle {
 
     private final int damage;
     private int hitPoint;
-    private String side;
+    private final String side;
 
     public Castle(int hitPoint, int damage, String side) {
         this.hitPoint = hitPoint;
@@ -27,9 +27,5 @@ public class Castle {
 
     public String getSide() {
         return side;
-    }
-
-    public void setSide(String side) {
-        this.side = side;
     }
 }

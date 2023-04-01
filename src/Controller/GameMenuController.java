@@ -29,6 +29,9 @@ public class GameMenuController {
         guest.setCastles();
         currentPlayer = host;
         otherPlayer = guest;
+        resetPlayerAbilities();
+        currentPlayer.setCastlesDestroyed(0);
+        otherPlayer.setCastlesDestroyed(0);
     }
 
     public static GameMenuMessages checkMoveTroop(String lineDirection, String direction, int rowNumber) {
@@ -53,9 +56,10 @@ public class GameMenuController {
     }
 
     public static GameMenuMessages checkDeployTroop(String lineDirection, int rowNumber, Card card) {
+        ArrayList<Card> battleDeck = currentPlayer.getBattleDeck();
         Place place = ClashRoyale.getPlace(lineDirection, rowNumber);
         if (card != null && checkDeployedCardName(card.getCardName()))
-            if (currentPlayer.getBattleDeck().contains(card))
+            if (ClashRoyale.cardExist(battleDeck, card.getCardName()))
                 if (checkLineDirection(lineDirection).equals(GameMenuMessages.SUCCESS))
                     if (checkRowNumber(rowNumber))
                         if (checkDeployedTroopRowNumber(rowNumber, currentPlayer))
@@ -72,45 +76,55 @@ public class GameMenuController {
 
     public static GameMenuMessages checkDeployHeal(String lineDirection, int rowNumber, User currentPlayer) {
         Place place = ClashRoyale.getPlace(lineDirection, rowNumber);
-        Spell heal = (Spell) ClashRoyale.getCardByName("Heal");
+        ArrayList<Card> battleDeck = currentPlayer.getBattleDeck();
+        Spell heal = (Spell) ClashRoyale.getCardTypeByName("Heal");
         if (checkLineDirection(lineDirection).equals(GameMenuMessages.SUCCESS))
-            if (currentPlayer.getBattleDeck().contains(heal))
-                if (checkRowNumber(rowNumber)) if (currentPlayer.getCardsToPlay() != 0) {
-                    deployCard(place, rowNumber, heal);
-                    return GameMenuMessages.SUCCESS;
-                } else return GameMenuMessages.NO_CARDS_TO_PLAY_LEFT;
+            if (ClashRoyale.cardExist(battleDeck, "Heal"))
+                if (checkRowNumber(rowNumber))
+                    if (currentPlayer.getCardsToPlay() != 0) {
+                        deployCard(place, rowNumber, heal);
+                        return GameMenuMessages.SUCCESS;
+                    } else return GameMenuMessages.NO_CARDS_TO_PLAY_LEFT;
                 else return GameMenuMessages.INVALID_ROW;
             else return GameMenuMessages.NOT_IN_BATTLE_DECK;
         else return GameMenuMessages.INVALID_LINE_DIRECTION;
     }
 
     public static GameMenuMessages checkDeployFireball(String lineDirection) {
-        Spell fireball = (Spell) ClashRoyale.getCardByName("Fireball");
+        ArrayList<Card> battleDeck = currentPlayer.getBattleDeck();
         if (checkLineDirection(lineDirection).equals(GameMenuMessages.SUCCESS))
-            if (currentPlayer.getBattleDeck().contains(fireball)) if (currentPlayer.getCardsToPlay() != 0)
-                if (otherPlayer.getCastleBySide(lineDirection).getHitPoint() > 0) {
-                    deployCard(lineDirection);
-                    return GameMenuMessages.SUCCESS;
-                } else return GameMenuMessages.DESTROYED_CASTLE;
-            else return GameMenuMessages.NO_CARDS_TO_PLAY_LEFT;
+            if (ClashRoyale.cardExist(battleDeck, "Fireball"))
+                if (currentPlayer.getCardsToPlay() != 0)
+                    if (otherPlayer.getCastleBySide(lineDirection) != null) {
+                        deployCard(lineDirection);
+                        return GameMenuMessages.SUCCESS;
+                    } else return GameMenuMessages.DESTROYED_CASTLE;
+                else return GameMenuMessages.NO_CARDS_TO_PLAY_LEFT;
             else return GameMenuMessages.NOT_IN_BATTLE_DECK;
         else return GameMenuMessages.INVALID_LINE_DIRECTION;
     }
 
     public static GameMenuMessages nextTurn(int turnsCount, int currentTurn) {
-        if (currentTurn < turnsCount * 2 && (host.getCastlesDestroyed() < 3 || guest.getCastlesDestroyed() < 3)) {
+        if (currentTurn < turnsCount * 2 && host.getCastlesDestroyed() < 3 && guest.getCastlesDestroyed() < 3) {
+            healAffect();
             if (currentPlayer.equals(guest)) {
                 fight();
                 resetPlayerAbilities();
+                removeDead();
             }
             changeTurns();
-            removeDead();
             return GameMenuMessages.NEXT_TURN;
         } else {
-            setPlayersGold();
-            setPlayersExperience();
-            setPlayersLevel();
-            return GameMenuMessages.END_GAME;
+            if (currentPlayer.equals(guest)) {
+                fight();
+                setPlayersGold();
+                setPlayersExperience();
+                setPlayersLevel();
+                return GameMenuMessages.END_GAME;
+            } else {
+                changeTurns();
+                return GameMenuMessages.NEXT_TURN;
+            }
         }
     }
 
@@ -208,21 +222,36 @@ public class GameMenuController {
     }
 
     private static void removeDead() {
-        for (Place place : ClashRoyale.getMap()) {
+        ArrayList<Place> map = ClashRoyale.getMap();
+        for (Place place : map) {
             Iterator<Card> iterator = place.getCards().iterator();
             while (iterator.hasNext()) {
                 Card cardInPlace = iterator.next();
                 if (cardInPlace instanceof Troop)
                     if (((Troop) cardInPlace).getHitPoint() <= 0)
                         iterator.remove();
+            }
+            removeDestroyedCastles(host);
+            removeDestroyedCastles(guest);
+        }
+    }
 
+    private static void healAffect() {
+        ArrayList<Place> map = ClashRoyale.getMap();
+        for (Place place : map) {
+            Iterator<Card> iterator = place.getCards().iterator();
+            while (iterator.hasNext()) {
+                Card cardInPlace = iterator.next();
                 if (cardInPlace instanceof Spell)
                     if (((Spell) cardInPlace).getHealAffect() == 0)
                         iterator.remove();
                     else ((Spell) cardInPlace).setHealAffect(((Spell) cardInPlace).getHealAffect() - 1);
             }
-
         }
+    }
+
+    private static void removeDestroyedCastles(User user) {
+        user.getCastles().removeIf(castle -> castle.getHitPoint() <= 0);
     }
 
     private static void heal(Troop card) {
@@ -247,28 +276,30 @@ public class GameMenuController {
         int currentRow = troop.getCurrentRow();
         User cardOwner = troop.getOwner();
         if (currentRow == 15 && cardOwner.equals(host))
-            fight(troop, lineDirection, cardDamage, cardHitPoint, host);
+            fight(troop, lineDirection, cardDamage, cardHitPoint, host, guest);
         else if (currentRow == 1 && cardOwner.equals(guest))
-            fight(troop, lineDirection, cardDamage, cardHitPoint, guest);
+            fight(troop, lineDirection, cardDamage, cardHitPoint, guest, host);
     }
 
-    private static void fight(Troop troop, String lineDirection, int cardDamage, int cardHitPoint, User user) {
+    private static void fight(Troop troop, String lineDirection, int cardDamage, int cardHitPoint, User attacker, User defender) {
         Castle castle;
-        castle = user.getCastleBySide(lineDirection);
-        int castleDamage = castle.getDamage();
-        int castleHitPoint = castle.getHitPoint();
-        troop.setHitPoint(cardHitPoint - castleDamage);
-        castle.setHitPoint(castleHitPoint - cardDamage);
-        if (castle.getHitPoint() <= 0) {
-            castle.setHitPoint(0);
-            user.setCastlesDestroyed(user.getCastlesDestroyed() + 1);
+        castle = defender.getCastleBySide(lineDirection);
+        if (castle != null) {
+            int castleDamage = castle.getDamage();
+            int castleHitPoint = castle.getHitPoint();
+            troop.setHitPoint(cardHitPoint - castleDamage);
+            castle.setHitPoint(castleHitPoint - cardDamage);
+            if (castle.getHitPoint() <= 0) {
+                castle.setHitPoint(0);
+                attacker.setCastlesDestroyed(attacker.getCastlesDestroyed() + 1);
+            }
         }
     }
 
     public static void resetPlayerAbilities() {
         currentPlayer.setMovesLeft(3);
-        otherPlayer.setMovesLeft(3);
         currentPlayer.setCardsToPlay(1);
+        otherPlayer.setMovesLeft(3);
         otherPlayer.setCardsToPlay(1);
     }
 
@@ -320,7 +351,8 @@ public class GameMenuController {
 
     public static int getHitPointsLeft(User user) {
         int userCastlesHitPoint = 0;
-        for (Castle userCastle : user.getCastles()) userCastlesHitPoint += userCastle.getHitPoint();
+        for (Castle userCastle : user.getCastles())
+            userCastlesHitPoint += userCastle.getHitPoint();
         return userCastlesHitPoint;
     }
 
@@ -340,16 +372,7 @@ public class GameMenuController {
         return currentPlayer;
     }
 
-    public static void setCurrentPlayer(User currentPlayer) {
-        GameMenuController.currentPlayer = currentPlayer;
-    }
-
     public static User getOtherPlayer() {
         return otherPlayer;
     }
-
-    public static void setOtherPlayer(User otherPlayer) {
-        GameMenuController.otherPlayer = otherPlayer;
-    }
-
 }

@@ -19,30 +19,30 @@ public class ProfileMenuController {
     }
 
     public static ProfileMenuMessages checkRemoveFromDeck(String name, User currentUser) {
-        Card card = ClashRoyale.getCardByName(name);
         ArrayList<Card> battleDeck = currentUser.getBattleDeck();
-        if (card != null)
-            if (battleDeck.contains(card))
+        Card card = ClashRoyale.getCardTypeByName(name);
+        if (card != null) {
+            if (ClashRoyale.cardExist(battleDeck, name))
                 if (battleDeck.size() > 1) {
-                    battleDeck.remove(card);
+                    battleDeck.removeIf(card1 -> card1.getCardName().equals(card.getCardName()));
                     return ProfileMenuMessages.SUCCESS;
                 } else return ProfileMenuMessages.INVALID_ACTION;
             else return ProfileMenuMessages.CARD_NOT_EXIST;
-        else return ProfileMenuMessages.INVALID_CARD_NAME;
+        } else return ProfileMenuMessages.INVALID_CARD_NAME;
     }
 
     public static ProfileMenuMessages checkAddToDeck(String name, User currentUser) {
-        Card card = ClashRoyale.getCardByName(name);
         ArrayList<Card> battleDeck = currentUser.getBattleDeck();
         ArrayList<Card> boughtCards = currentUser.getBoughtCards();
+        Card card = ClashRoyale.getCardTypeByName(name);
         if (card != null)
-            if (boughtCards.contains(card))
-                if (!battleDeck.contains(card))
-                    if (boughtCards.size() != 4) {
+            if (ClashRoyale.cardExist(boughtCards, name))
+                if (!ClashRoyale.cardExist(battleDeck, name)) {
+                    if (battleDeck.size() != 4) {
                         battleDeck.add(card);
                         return ProfileMenuMessages.SUCCESS;
                     } else return ProfileMenuMessages.INVALID_ACTION;
-                else return ProfileMenuMessages.CARD_EXIST;
+                } else return ProfileMenuMessages.CARD_EXIST;
             else return ProfileMenuMessages.CARD_NOT_EXIST;
         else return ProfileMenuMessages.INVALID_CARD_NAME;
     }
