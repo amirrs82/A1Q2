@@ -1,21 +1,14 @@
 package View.Menus;
 
 import Controller.ProfileMenuController;
-import Model.Cards.Card;
-import Model.ClashRoyale;
-import Model.User;
 import View.enums.Commands.ProfileMenuCommands;
 import View.enums.Messages.ProfileMenuMessages;
 
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 
 
 public class ProfileMenu {
-    private final User currentUser = ClashRoyale.getCurrentUser();
-
     public void run(Scanner scanner) {
         String command;
         Matcher matcher;
@@ -40,7 +33,7 @@ public class ProfileMenu {
     private void changePassword(Matcher matcher) {
         String oldPassword = matcher.group("oldPassword");
         String newPassword = matcher.group("newPassword");
-        ProfileMenuMessages message = ProfileMenuController.changePassword(oldPassword, newPassword, currentUser);
+        ProfileMenuMessages message = ProfileMenuController.changePassword(oldPassword, newPassword);
         switch (message) {
             case INCORRECT_PASSWORD:
                 System.out.println("Incorrect password!");
@@ -55,17 +48,12 @@ public class ProfileMenu {
     }
 
     private void showInfo() {
-        System.out.println("username: " + currentUser.getUsername());
-        System.out.println("password: " + currentUser.getPassword());
-        System.out.println("level: " + currentUser.getLevel());
-        System.out.println("experience: " + currentUser.getExperience());
-        System.out.println("gold: " + currentUser.getGold());
-        System.out.println("rank: " + currentUser.getRanking());
+        System.out.println(ProfileMenuController.showInfo());
     }
 
     private void checkRemoveFromDeck(Matcher matcher) {
         String name = matcher.group("name");
-        ProfileMenuMessages message = ProfileMenuController.checkRemoveFromDeck(name, currentUser);
+        ProfileMenuMessages message = ProfileMenuController.checkRemoveFromDeck(name);
         switch (message) {
             case INVALID_CARD_NAME:
                 System.out.println("Invalid card name!");
@@ -84,7 +72,7 @@ public class ProfileMenu {
 
     private void checkAddToDeck(Matcher matcher) {
         String name = matcher.group("name");
-        ProfileMenuMessages message = ProfileMenuController.checkAddToDeck(name, currentUser);
+        ProfileMenuMessages message = ProfileMenuController.checkAddToDeck(name);
         switch (message) {
             case INVALID_CARD_NAME:
                 System.out.println("Invalid card name!");
@@ -105,9 +93,6 @@ public class ProfileMenu {
     }
 
     public void showBattleDeck() {
-        ArrayList<Card> battleDeck = currentUser.getBattleDeck();
-        battleDeck.sort(Comparator.comparing(Card::getCardName));
-        for (Card card : battleDeck)
-            System.out.println(card.getCardName());
+        System.out.print(ProfileMenuController.showBattleDeck());
     }
 }

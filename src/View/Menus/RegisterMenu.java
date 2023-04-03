@@ -1,8 +1,6 @@
 package View.Menus;
 
 import Controller.RegisterMenuController;
-import Model.ClashRoyale;
-import Model.User;
 import View.enums.Commands.RegisterMenuCommands;
 import View.enums.Messages.RegisterMenuMessages;
 
@@ -10,7 +8,6 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 
 public class RegisterMenu {
-
     public void run() {
         Scanner scanner = new Scanner(System.in);
         String command;
@@ -66,8 +63,6 @@ public class RegisterMenu {
                 break;
             case SUCCESS:
                 System.out.println("User " + username + " logged in!");
-                User loggedInUser = ClashRoyale.getUserByUsername(username);
-                ClashRoyale.setCurrentUser(loggedInUser);
                 new MainMenu().run(scanner);
                 break;
         }

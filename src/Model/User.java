@@ -1,10 +1,10 @@
 package Model;
 
 
-import Controller.MainMenuController;
-import Model.Cards.Barbarian;
+//import Controller.Controller;
 import Model.Cards.Card;
-import Model.Cards.Fireball;
+import Model.Cards.Spell;
+import Model.Cards.Troop;
 
 import java.util.ArrayList;
 
@@ -29,8 +29,8 @@ public class User {
         gold = 100;
         level = 1;
         experience = 0;
-        Barbarian barbarian = new Barbarian(2000, 900, 100, "Barbarian");
-        Fireball fireball = new Fireball(1600, 100, "Fireball");
+        Troop barbarian = new Troop(2000, 900, 100, "Barbarian");
+        Spell fireball = new Spell(1600, 100, "Fireball");
         battleDeck.add(barbarian);
         battleDeck.add(fireball);
         boughtCards.add(barbarian);
@@ -112,17 +112,6 @@ public class User {
         return username;
     }
 
-    public int getRanking() {
-        User currentUser = ClashRoyale.getCurrentUser();
-        ArrayList<User> sortedUsers = MainMenuController.sortUsers(ClashRoyale.getUsers());
-        int i = 0;
-        for (User sortedUser : sortedUsers) {
-            if (sortedUser == currentUser) return i + 1;
-            i++;
-        }
-        return 0;
-    }
-
     public String getPassword() {
         return password;
     }
@@ -135,9 +124,8 @@ public class User {
         this.password = password;
     }
 
-    public static boolean isPasswordCorrect(String username, String password) {
-        User user = ClashRoyale.getUserByUsername(username);
-        return user.getPassword().equals(password);
+    public boolean isPasswordCorrect(String password) {
+        return this.password.equals(password);
     }
 
     public User(String username, String password) {

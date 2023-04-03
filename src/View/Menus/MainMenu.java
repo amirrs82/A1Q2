@@ -1,12 +1,9 @@
 package View.Menus;
 
 import Controller.MainMenuController;
-import Model.ClashRoyale;
-import Model.User;
 import View.enums.Commands.MainMenuCommands;
 import View.enums.Messages.MainMenuMessages;
 
-import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 
@@ -17,7 +14,7 @@ public class MainMenu {
         while (true) {
             command = scanner.nextLine();
             if (command.equals("logout")) {
-                System.out.println("User " + ClashRoyale.getCurrentUser().getUsername() + " logged out successfully!");
+                System.out.println(MainMenuController.logout());
                 break;
             } else if (command.equals("list of users")) showUsers();
             else if (command.equals("scoreboard")) showScoreboard();
@@ -35,17 +32,11 @@ public class MainMenu {
     }
 
     private void showScoreboard() {
-        ArrayList<User> sortedUsers = new ArrayList<>(MainMenuController.sortUsers(ClashRoyale.getUsers()));
-        for (int i = 0; i < 5 && i < sortedUsers.size(); i++) {
-            User user = sortedUsers.get(i);
-            System.out.println((i + 1) + "- username: " + user.getUsername() + " level: " + user.getLevel() + " experience: " + user.getExperience());
-        }
+        System.out.print(MainMenuController.showScoreboard());
     }
 
     private void showUsers() {
-        int i = 0;
-        for (User user : ClashRoyale.getUsers())
-            System.out.println("user " + ++i + ": " + user.getUsername());
+        System.out.print(MainMenuController.showUsers());
     }
 
     private void checkStartGame(Matcher matcher, Scanner scanner) {

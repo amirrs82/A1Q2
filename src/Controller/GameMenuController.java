@@ -12,13 +12,11 @@ import View.enums.Messages.GameMenuMessages;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-
 public class GameMenuController {
     private static User host;
     private static User guest;
     private static User currentPlayer;
     private static User otherPlayer;
-
     private static Card movedCard;
 
     public static void startGame(String guestUsername) {
@@ -34,18 +32,60 @@ public class GameMenuController {
         otherPlayer.setCastlesDestroyed(0);
     }
 
+    public static String showHitPoints() {
+        String hitPointOutput = "";
+        Castle middleCastle = otherPlayer.getCastleBySide("middle");
+        Castle leftCastle = otherPlayer.getCastleBySide("left");
+        Castle rightCastle = otherPlayer.getCastleBySide("right");
+        hitPointOutput += "middle castle: ";
+        if (middleCastle != null && middleCastle.getHitPoint() > 0)
+            hitPointOutput += (middleCastle.getHitPoint() + "\n");
+        else hitPointOutput += ("-1\n");
+
+        hitPointOutput += "left castle: ";
+        if (leftCastle != null && leftCastle.getHitPoint() > 0) hitPointOutput += (leftCastle.getHitPoint() + "\n");
+        else hitPointOutput += ("-1\n");
+
+        hitPointOutput += "right castle: ";
+        if (rightCastle != null && rightCastle.getHitPoint() > 0) hitPointOutput += (rightCastle.getHitPoint() + "\n");
+        else hitPointOutput += ("-1\n");
+        return hitPointOutput;
+    }
+
+    public static String printMaps(String lineDirection) {
+        String mapOutput = "";
+        mapOutput += lineDirection + " line:\n";
+        for (Place place : ClashRoyale.getMap()) {
+            ArrayList<Card> cardsInPlace = place.getCards();
+            if (place.getLineDirection().equals(lineDirection))
+                for (Card card : cardsInPlace) {
+                    User owner = card.getOwner();
+                    mapOutput += "row " + place.getRowNumber() + ": " + card.getCardName() + ": " + owner.getUsername() + "\n";
+                }
+        }
+        return mapOutput;
+    }
+
+    public static String getCardsToPlay() {
+        return "You can play " + currentPlayer.getCardsToPlay() + " cards more!";
+    }
+
+    public static String getMovesLeft() {
+        return "You have " + currentPlayer.getMovesLeft() + " moves left!";
+    }
+
     public static GameMenuMessages checkMoveTroop(String lineDirection, String direction, int rowNumber) {
         Place place = ClashRoyale.getPlace(lineDirection, rowNumber);
         int move = 1; //case upward
         if (direction.equals("downward")) move = -1;//case downward
         if (checkLineDirection(lineDirection).equals(GameMenuMessages.SUCCESS))
-            if (checkRowNumber(rowNumber))
+            if (Controller.checkRowNumber(rowNumber))
                 if (checkDirection(direction).equals(GameMenuMessages.SUCCESS)) {
-                    Card userCardInPlace = getCardInPlace(place, currentPlayer);
+                    Troop userTroopInPlace = getTroopInPlace(place, currentPlayer);
                     if (currentPlayer.getMovesLeft() > 0)
-                        if (userCardInPlace != null)
-                            if ((checkRowNumber(userCardInPlace.getCurrentRow() + move))) {
-                                moveTroop(place, move);
+                        if (userTroopInPlace != null)
+                            if ((Controller.checkRowNumber(userTroopInPlace.getCurrentRow() + move))) {
+                                moveTroop(place, userTroopInPlace, move);
                                 return GameMenuMessages.SUCCESS;
                             } else return GameMenuMessages.INVALID_MOVE;
                         else return GameMenuMessages.NO_TROOPS_IN_PLACE;
@@ -55,14 +95,23 @@ public class GameMenuController {
         else return GameMenuMessages.INVALID_LINE_DIRECTION;
     }
 
-    public static GameMenuMessages checkDeployTroop(String lineDirection, int rowNumber, Card card) {
+    public static String moveTroop(String lineDirection) {
+        Troop troop = (Troop) GameMenuController.getMovedCard();
+        String cardName = troop.getCardName();
+        int currentRow = troop.getCurrentRow();
+        return cardName + " moved successfully to row " + currentRow + " in line " + lineDirection;
+    }
+
+    public static GameMenuMessages checkDeployTroop(String lineDirection, int rowNumber, String troopName) {
+        Card card = ClashRoyale.getCardTypeByName(troopName);
         ArrayList<Card> battleDeck = currentPlayer.getBattleDeck();
         Place place = ClashRoyale.getPlace(lineDirection, rowNumber);
-        if (card != null && checkDeployedCardName(card.getCardName()))
+
+        if (card != null && Controller.checkDeployedCardName(card.getCardName()))
             if (ClashRoyale.cardExist(battleDeck, card.getCardName()))
                 if (checkLineDirection(lineDirection).equals(GameMenuMessages.SUCCESS))
-                    if (checkRowNumber(rowNumber))
-                        if (checkDeployedTroopRowNumber(rowNumber, currentPlayer))
+                    if (Controller.checkRowNumber(rowNumber))
+                        if (Controller.checkDeployedTroopRowNumber(rowNumber, currentPlayer))
                             if (currentPlayer.getCardsToPlay() != 0) {
                                 deployCard(place, rowNumber, card);
                                 return GameMenuMessages.SUCCESS;
@@ -74,13 +123,13 @@ public class GameMenuController {
         else return GameMenuMessages.INVALID_CARD_NAME;
     }
 
-    public static GameMenuMessages checkDeployHeal(String lineDirection, int rowNumber, User currentPlayer) {
+    public static GameMenuMessages checkDeployHeal(String lineDirection, int rowNumber) {
         Place place = ClashRoyale.getPlace(lineDirection, rowNumber);
         ArrayList<Card> battleDeck = currentPlayer.getBattleDeck();
         Spell heal = (Spell) ClashRoyale.getCardTypeByName("Heal");
         if (checkLineDirection(lineDirection).equals(GameMenuMessages.SUCCESS))
             if (ClashRoyale.cardExist(battleDeck, "Heal"))
-                if (checkRowNumber(rowNumber))
+                if (Controller.checkRowNumber(rowNumber))
                     if (currentPlayer.getCardsToPlay() != 0) {
                         deployCard(place, rowNumber, heal);
                         return GameMenuMessages.SUCCESS;
@@ -138,41 +187,19 @@ public class GameMenuController {
         return GameMenuMessages.INVALID_DIRECTION;
     }
 
-    public static boolean checkRowNumber(int rowNumber) {
-        return rowNumber >= 1 && rowNumber <= 15;
-    }
-
-    public static boolean checkDeployedCardName(String cardName) {
-        return cardName.matches("Barbarian|Ice Wizard|Baby Dragon");
-    }
-
-    public static boolean checkDeployedTroopRowNumber(int rowNumber, User currentPlayer) {
-        if (currentPlayer.equals(ClashRoyale.getCurrentUser())) return rowNumber >= 1 && rowNumber <= 4; //host
-        else return rowNumber <= 15 && rowNumber >= 12; //guest
-
-    }
-
-    public static Card getCardInPlace(Place place, User user) {
+    public static Troop getTroopInPlace(Place place, User user) {
         ArrayList<Card> cardsInPlace = place.getCards();
         for (Card card : cardsInPlace)
-            if (card.getOwner().equals(user) && card instanceof Troop) return card;
+            if (card.getOwner().equals(user) && card instanceof Troop) return (Troop) card;
         return null;
     }
 
-    public static void moveTroop(Place place, int move) {
-        Iterator<Card> iterator = place.getCards().iterator();
-        Card card = null;
-        while (iterator.hasNext()) {
-            card = iterator.next();
-            if (card.getOwner().equals(currentPlayer) && card instanceof Troop) {
-                card.setCurrentRow(card.getCurrentRow() + move);
-                iterator.remove();
-                break;
-            }
-        }
+    public static void moveTroop(Place place, Troop userTroopInPlace, int move) {
         Place newPlace = ClashRoyale.getPlace(place.getLineDirection(), place.getRowNumber() + move);
-        newPlace.getCards().add(card);
-        movedCard = card;
+        newPlace.getCards().add(userTroopInPlace);
+        userTroopInPlace.setCurrentRow(userTroopInPlace.getCurrentRow() + move);
+        place.getCards().removeIf(userTroopInPlace::equals);
+        movedCard = userTroopInPlace;
         currentPlayer.setMovesLeft(currentPlayer.getMovesLeft() - 1);
     }
 
@@ -224,13 +251,8 @@ public class GameMenuController {
     private static void removeDead() {
         ArrayList<Place> map = ClashRoyale.getMap();
         for (Place place : map) {
-            Iterator<Card> iterator = place.getCards().iterator();
-            while (iterator.hasNext()) {
-                Card cardInPlace = iterator.next();
-                if (cardInPlace instanceof Troop)
-                    if (((Troop) cardInPlace).getHitPoint() <= 0)
-                        iterator.remove();
-            }
+            ArrayList<Card> cardsInPlace = place.getCards();
+            cardsInPlace.removeIf(cardInPlace -> cardInPlace instanceof Troop && ((Troop) cardInPlace).getHitPoint() <= 0);
             removeDestroyedCastles(host);
             removeDestroyedCastles(guest);
         }
@@ -255,7 +277,7 @@ public class GameMenuController {
     }
 
     private static void heal(Troop card) {
-        card.setHitPoint(Math.min(card.getHitPoint() + 1000, card.getMaxHitPoint()));
+        card.setHitPoint(Math.min(card.getHitPoint() + 1000, card.getMaxHitPoint()));//heal givenHitPoint is 1000
     }
 
     public static void fight(Troop firstCard, Troop secondCard) {
@@ -309,15 +331,18 @@ public class GameMenuController {
         otherPlayer = tempUser;
     }
 
-    public static User getWinner() {
-        if (host.getCastlesDestroyed() > guest.getCastlesDestroyed()) return host;
-        else if (host.getCastlesDestroyed() < guest.getCastlesDestroyed()) return guest;
+    public static String getWinner() {
+        String wins = "Game has ended. Winner: ";
+        String hostWins = wins + host.getUsername();
+        String guestWins = wins + guest.getUsername();
+        if (host.getCastlesDestroyed() > guest.getCastlesDestroyed()) return hostWins;
+        else if (host.getCastlesDestroyed() < guest.getCastlesDestroyed()) return guestWins;
         else {
             int hostCastlesHitPoint = getHitPointsLeft(host);
             int guestCastlesHitPoint = getHitPointsLeft(guest);
-            if (hostCastlesHitPoint > guestCastlesHitPoint) return host;
-            else if (hostCastlesHitPoint < guestCastlesHitPoint) return guest;
-            else return null;
+            if (hostCastlesHitPoint > guestCastlesHitPoint) return hostWins;
+            else if (hostCastlesHitPoint < guestCastlesHitPoint) return guestWins;
+            else return "Game has ended. Result: Tie";
         }
     }
 
@@ -370,9 +395,5 @@ public class GameMenuController {
 
     public static User getCurrentPlayer() {
         return currentPlayer;
-    }
-
-    public static User getOtherPlayer() {
-        return otherPlayer;
     }
 }

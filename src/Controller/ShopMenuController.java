@@ -9,19 +9,21 @@ import java.util.ArrayList;
 
 
 public class ShopMenuController {
+
     public static ShopMenuMessages checkBuyCard(String name) {
         User currentUser = ClashRoyale.getCurrentUser();
         ArrayList<Card> boughtCards = currentUser.getBoughtCards();
         Card card = ClashRoyale.getCardTypeByName(name);
         int currentUserGold = currentUser.getGold();
-        if (card != null) if (currentUserGold >= card.getPrice()) {
-            if (!ClashRoyale.cardExist(boughtCards, name)) {
-                card = ClashRoyale.getCardTypeByName(name);
-                boughtCards.add(card);
-                currentUser.setGold(currentUserGold - card.getPrice());
-                return ShopMenuMessages.SUCCESS;
-            } else return ShopMenuMessages.CARD_EXIST;
-        } else return ShopMenuMessages.NOT_ENOUGH_GOLD;
+        if (card != null)
+            if (currentUserGold >= card.getPrice())
+                if (!ClashRoyale.cardExist(boughtCards, name)) {
+                    card = ClashRoyale.getCardTypeByName(name);
+                    boughtCards.add(card);
+                    currentUser.setGold(currentUserGold - card.getPrice());
+                    return ShopMenuMessages.SUCCESS;
+                } else return ShopMenuMessages.CARD_EXIST;
+            else return ShopMenuMessages.NOT_ENOUGH_GOLD;
         else return ShopMenuMessages.INVALID_CARD_NAME;
     }
 

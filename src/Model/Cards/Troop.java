@@ -5,7 +5,6 @@ public class Troop extends Card {
     private int hitPoint;
     private final int maxHitPoint;
 
-
     public int getHitPoint() {
         return hitPoint;
     }

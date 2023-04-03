@@ -1,23 +1,13 @@
 package View.Menus;
 
 import Controller.GameMenuController;
-import Model.Cards.Card;
-import Model.Cards.Troop;
-import Model.Castle;
-import Model.ClashRoyale;
-import Model.Place;
-import Model.User;
 import View.enums.Commands.GameMenuCommands;
 import View.enums.Messages.GameMenuMessages;
 
-import java.util.*;
+import java.util.Scanner;
 import java.util.regex.Matcher;
 
 public class GameMenu {
-
-    private User currentPlayer;
-
-    private User otherPlayer;
     private boolean end = false;
 
     public void run(Scanner scanner, String guestUsername, int turnsCount) {
@@ -26,17 +16,15 @@ public class GameMenu {
         Matcher matcher;
         int currentTurn = 1;
         while (!end) {
-            currentPlayer = GameMenuController.getCurrentPlayer();
-            otherPlayer = GameMenuController.getOtherPlayer();
             command = scanner.nextLine();
             if (command.equals("show current menu")) System.out.println("Game Menu");
             else if (command.equals("show the hitpoints left of my opponent")) showHitPoints();
             else if ((matcher = GameMenuCommands.getMatcher(command, GameMenuCommands.SHOW_LINE_INFO)) != null)
                 showLineInfo(matcher);
             else if (command.equals("number of cards to play"))
-                System.out.println("You can play " + currentPlayer.getCardsToPlay() + " cards more!");
+                System.out.println(GameMenuController.getCardsToPlay());
             else if (command.equals("number of moves left"))
-                System.out.println("You have " + currentPlayer.getMovesLeft() + " moves left!");
+                System.out.println(GameMenuController.getMovesLeft());
             else if ((matcher = GameMenuCommands.getMatcher(command, GameMenuCommands.MOVE_TROOP)) != null)
                 checkMoveTroop(matcher);
             else if ((matcher = GameMenuCommands.getMatcher(command, GameMenuCommands.DEPLOY_TROOP)) != null)
@@ -53,20 +41,7 @@ public class GameMenu {
     }
 
     private void showHitPoints() {
-        Castle middleCastle = otherPlayer.getCastleBySide("middle");
-        Castle leftCastle = otherPlayer.getCastleBySide("left");
-        Castle rightCastle = otherPlayer.getCastleBySide("right");
-        System.out.print("middle castle: ");
-        if (middleCastle != null && middleCastle.getHitPoint() > 0) System.out.println(middleCastle.getHitPoint());
-        else System.out.println("-1");
-
-        System.out.print("left castle: ");
-        if (leftCastle != null && leftCastle.getHitPoint() > 0) System.out.println(leftCastle.getHitPoint());
-        else System.out.println("-1");
-
-        System.out.print("right castle: ");
-        if (rightCastle != null && rightCastle.getHitPoint() > 0) System.out.println(rightCastle.getHitPoint());
-        else System.out.println("-1");
+        System.out.print(GameMenuController.showHitPoints());
     }
 
     private void showLineInfo(Matcher matcher) {
@@ -77,23 +52,11 @@ public class GameMenu {
                 System.out.println("Incorrect line direction!");
                 break;
             case SUCCESS:
-                printMaps(lineDirection);
+                System.out.print(GameMenuController.printMaps(lineDirection));
                 break;
         }
     }
 
-    public void printMaps(String lineDirection) {
-        System.out.println(lineDirection + " line:");
-        for (Place place : ClashRoyale.getMap()) {
-            ArrayList<Card> cardsInPlace = place.getCards();
-            if (place.getLineDirection().equals(lineDirection)) {
-                for (Card card : cardsInPlace) {
-                    User owner = card.getOwner();
-                    System.out.println("row " + place.getRowNumber() + ": " + card.getCardName() + ": " + owner.getUsername());
-                }
-            }
-        }
-    }
 
     private void checkMoveTroop(Matcher matcher) {
         String lineDirection = matcher.group("lineDirection");
@@ -120,25 +83,22 @@ public class GameMenu {
                 System.out.println("Invalid move!");
                 break;
             case SUCCESS:
-                Troop troop = (Troop) GameMenuController.getMovedCard();
-                String cardName = troop.getCardName();
-                int currentRow = troop.getCurrentRow();
-                System.out.println(cardName + " moved successfully to row " + currentRow + " in line " + lineDirection);
+                System.out.println(GameMenuController.moveTroop(lineDirection));
                 break;
         }
     }
 
     private void checkDeployTroop(Matcher matcher) {
-        Card card = ClashRoyale.getCardTypeByName(matcher.group("troopName"));
+        String troopName = matcher.group("troopName");
         String lineDirection = matcher.group("lineDirection");
         int rowNumber = Integer.parseInt(matcher.group("rowNumber"));
-        GameMenuMessages message = GameMenuController.checkDeployTroop(lineDirection, rowNumber, card);
+        GameMenuMessages message = GameMenuController.checkDeployTroop(lineDirection, rowNumber, troopName);
         switch (message) {
             case INVALID_CARD_NAME:
                 System.out.println("Invalid troop name!");
                 break;
             case NOT_IN_BATTLE_DECK:
-                System.out.println("You don't have " + card.getCardName() + " card in your battle deck!");
+                System.out.println("You don't have " + troopName + " card in your battle deck!");
                 break;
             case INVALID_LINE_DIRECTION:
                 System.out.println("Incorrect line direction!");
@@ -153,7 +113,7 @@ public class GameMenu {
                 System.out.println("You have deployed a troop or spell this turn!");
                 break;
             case SUCCESS:
-                System.out.println("You have deployed " + card.getCardName() + " successfully!");
+                System.out.println("You have deployed " + troopName + " successfully!");
                 break;
         }
     }
@@ -161,7 +121,7 @@ public class GameMenu {
     public void checkDeployHeal(Matcher matcher) {
         String lineDirection = matcher.group("lineDirection");
         int rowNumber = Integer.parseInt(matcher.group("rowNumber"));
-        GameMenuMessages message = GameMenuController.checkDeployHeal(lineDirection, rowNumber, currentPlayer);
+        GameMenuMessages message = GameMenuController.checkDeployHeal(lineDirection, rowNumber);
         switch (message) {
             case INVALID_LINE_DIRECTION:
                 System.out.println("Incorrect line direction!");
@@ -207,14 +167,12 @@ public class GameMenu {
         GameMenuMessages message = GameMenuController.nextTurn(turnsCount, currentTurn);
         switch (message) {
             case NEXT_TURN:
-                currentPlayer = GameMenuController.getCurrentPlayer();
-                System.out.println("Player " + currentPlayer.getUsername() + " is now playing!");
+                String currentPlayerName = GameMenuController.getCurrentPlayer().getUsername();
+                System.out.println("Player " + currentPlayerName + " is now playing!");
                 break;
             case END_GAME:
                 end = true;
-                User winner = GameMenuController.getWinner();
-                if (winner == null) System.out.println("Game has ended. Result: Tie");
-                else System.out.println("Game has ended. Winner: " + winner.getUsername());
+                System.out.println(GameMenuController.getWinner());
                 break;
         }
     }

@@ -2,7 +2,7 @@ package Model.Cards;
 
 public class Spell extends Card {
 
-    private int healAffect = 2;
+    int healAffect = 2;
 
     public int getHealAffect() {
         return healAffect;

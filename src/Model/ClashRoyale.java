@@ -60,15 +60,15 @@ public class ClashRoyale {
     public static Card getCardTypeByName(String name) {
         switch (name) {
             case "Barbarian":
-                return new Barbarian(900, 2000, 100, name);
+                return new Troop(900, 2000, 100, name);
             case "Ice Wizard":
-                return new IceWizard(1500, 3500, 180, name);
+                return new Troop(1500, 3500, 180, name);
             case "Baby Dragon":
-                return new BabyDragon(1200, 3300, 200, name);
+                return new Troop(1200, 3300, 200, name);
             case "Fireball":
-                return new Fireball(1600, 100, name);
+                return new Spell(1600, 100, name);
             case "Heal":
-                return new Heal(1000, 150, name);
+                return new Spell(1000, 150, name);
             default:
                 return null;
         }
